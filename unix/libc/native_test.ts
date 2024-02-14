@@ -59,7 +59,7 @@ test("getGroup", () => {
         assert.exists(group);
         assert.equals(group.name, "root");
         assert.equals(group.gid, 0);
-        // assert.equals(group.members.length, 0);
+        assert.equals(group.members.length, 0);
     }
 });
 
@@ -72,7 +72,7 @@ test("getGroupRes", () => {
         const group = r.unwrap();
         assert.equals(group.name, "root");
         assert.equals(group.gid, 0);
-        // assert.equals(group.members.length, 0);
+        assert.equals(group.members.length, 0);
     }
 });
 
