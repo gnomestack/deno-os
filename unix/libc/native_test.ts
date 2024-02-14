@@ -1,6 +1,6 @@
 import { test, assert } from "../../deps.dev.ts"
 import { IS_WINDOWS } from "../../deps.ts";
-import { getGroups, getGroupsRes, getGroup, getGroupRes, getGroupName, getGroupNameRes, getUserName, getUserNameRes } from "./native.ts";
+import { getGroups, getGroupsRes, getGroup, getGroupRes, getGroupName, getGroupNameRes, getUserName, getUserNameRes, getUser, getUserRes } from "./native.ts";
 
 test("getGroups", () => {
     const groups = getGroups();
@@ -76,12 +76,29 @@ test("getUserName", () => {
     }
 });
 
-test("getUserNameRes", () => {
-    const r = getUserNameRes(0);
+test("getUserRes", () => {
+    const r = getUserRes(0);
     if (IS_WINDOWS) {
         assert.falsey(r.isOk);
     } else {
         assert.ok(r.isOk);
-        assert.equals(r.unwrap(), "root");
+        const user = r.unwrap();
+        assert.equals(user.name, "root");
+        assert.equals(user.uid, 0);
+        assert.equals(user.gid, 0);
     }
 });
+
+test("getUser", () => {
+    const user = getUser(0);
+    if (IS_WINDOWS) {
+        assert.ok(user === null, "user should be null on Windows.");
+    } else {
+        assert.exists(user);
+        assert.equals(user.name, "root");
+        assert.equals(user.uid, 0);
+        assert.equals(user.gid, 0);
+    }
+});
+
+
