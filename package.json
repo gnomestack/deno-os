@@ -1,0 +1,20 @@
+{
+    "name": "gs_std",
+    "license": "MIT",
+    "description": "The gnomestack standard library",
+    "icon": "https://raw.githubusercontent.com/gnomestack/deno-std/.eng/assets/icon.png",
+    "readme": "./README.md",
+    "module": "./mod.ts",
+    "repository": {
+        "url": "https://github.com/gnomestack/deno-std",
+        "type": "git"
+    },
+    "author": {
+        "name": "BowTiedGnome",
+        "email": "119234633+bowtiedgnome@users.noreply.github.com"
+    },
+    "version": "0.0.2",
+    "deps": {
+        "std": "0.208.0"
+    }
+}
