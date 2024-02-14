@@ -4,6 +4,10 @@ let zeroPtr: Ptr | undefined = undefined;
 // deno-lint-ignore no-unused-vars
 const zeroUint8Array: Uint8Array | undefined = undefined;
 
+export interface IClosable {
+    close(): void;
+}
+
 export class Ptr {
     #ptr: Deno.PointerValue;
 
