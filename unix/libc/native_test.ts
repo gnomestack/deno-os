@@ -1,16 +1,17 @@
-import { test, assert } from "../../deps.dev.ts"
+import { assert, test } from "../../deps.dev.ts";
 import { IS_WINDOWS } from "../../deps.ts";
-import { 
-    getGroups, 
-    getGroupsRes, 
-    getGroup, 
-    getGroupRes, 
-    getGroupName, 
-    getGroupNameRes, 
-    getUserName, 
-    getUserNameRes, 
-    getUser, 
-    getUserRes } from "./mod.ts";
+import {
+    getGroup,
+    getGroupName,
+    getGroupNameRes,
+    getGroupRes,
+    getGroups,
+    getGroupsRes,
+    getUser,
+    getUserName,
+    getUserNameRes,
+    getUserRes,
+} from "./mod.ts";
 
 test("getGroups", () => {
     const groups = getGroups();

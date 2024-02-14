@@ -1,14 +1,7 @@
-import { StringBuilder, PlatformNotSupportedError, ok, fail, IS_WINDOWS } from "../../deps.ts";
-import { IClosable, FunctionMissingError } from "../../ffi/mod.ts";
+import { fail, IS_WINDOWS, ok, PlatformNotSupportedError, StringBuilder } from "../../deps.ts";
+import { FunctionMissingError, IClosable } from "../../ffi/mod.ts";
 
-export {
-    StringBuilder,
-    PlatformNotSupportedError,
-    ok,
-    fail,
-    IS_WINDOWS,
-    FunctionMissingError,
-};
+export { fail, FunctionMissingError, IS_WINDOWS, ok, PlatformNotSupportedError, StringBuilder };
 
 export type { IClosable };
 
@@ -72,21 +65,25 @@ export class ErrnoError extends Error {
 
 /**
  * Creates an error from an errno from libc. The error message is created using `strerror_r` if available.
- * 
+ *
  * @description
  * Requires `strerror_r` to be available in the current environment and the deno ffi permission.
- * 
+ *
  * @param errno The errno to create an error from.
  * @param strerror_r The `strerror_r` function to use. If not provided, it will be loaded from the system library.
  * @returns The `ErrnoError`.
  * @see ErrnoError
  */
-export function createErrnoError(errno: number, strerror_r: null | ((errno: number, buf: Uint8Array, bufLength: number) => number)) {
-    if (errno < 0)
+export function createErrnoError(
+    errno: number,
+    strerror_r: null | ((errno: number, buf: Uint8Array, bufLength: number) => number),
+) {
+    if (errno < 0) {
         return new ErrnoError(errno, `Error ${errno}.  Negative errno is not valid.`);
-    
+    }
+
     if (strerror_r === undefined || strerror_r === null) {
-        let disposable : IClosable | null = null;
+        let disposable: IClosable | null = null;
         try {
             const lib = Deno.dlopen(Deno.build.os === "windows" ? "msvcrt.dll" : "libc.so", {
                 strerror_r: {
@@ -103,17 +100,16 @@ export function createErrnoError(errno: number, strerror_r: null | ((errno: numb
 
             let ret = Errno.ERANGE as number;
             let bufLength = 1024;
-            while(ret === Errno.ERANGE)
-            {
+            while (ret === Errno.ERANGE) {
                 const buf = new Uint8Array(bufLength);
                 ret = strerror_r(errno, buf, bufLength);
                 if (ret !== 0) {
                     const sb = new StringBuilder();
-                    for (let i = 0; i < 64; i++)
-                    {
+                    for (let i = 0; i < 64; i++) {
                         const c = buf[i];
-                        if (c === 0)
+                        if (c === 0) {
                             break;
+                        }
                         sb.appendChar(c);
                     }
                     return new ErrnoError(errno, sb.toString());
@@ -123,24 +119,24 @@ export function createErrnoError(errno: number, strerror_r: null | ((errno: numb
         } catch {
             return new ErrnoError(errno);
         } finally {
-            if (disposable !== null)
+            if (disposable !== null) {
                 disposable.close();
+            }
         }
     }
 
     let bufLength = 1024;
     let ret = Errno.ERANGE as number;
-    while(ret === Errno.ERANGE)
-    {
+    while (ret === Errno.ERANGE) {
         const buf = new Uint8Array(bufLength);
         ret = strerror_r(errno, buf, bufLength);
         if (ret !== 0) {
             const sb = new StringBuilder();
-            for (let i = 0; i < 64; i++)
-            {
+            for (let i = 0; i < 64; i++) {
                 const c = buf[i];
-                if (c === 0)
+                if (c === 0) {
                     break;
+                }
                 sb.appendChar(c);
             }
             return new ErrnoError(errno, sb.toString());

@@ -1,54 +1,55 @@
-import { 
-    fail, 
-    ok, 
+import {
     createErrnoError,
-    PlatformNotSupportedError, 
-    IS_WINDOWS , 
-    IUser, 
-    IClosable, 
-    FunctionMissingError, 
-    Errno
+    Errno,
+    fail,
+    FunctionMissingError,
+    IClosable,
+    IS_WINDOWS,
+    IUser,
+    ok,
+    PlatformNotSupportedError,
 } from "./types.ts";
 
 export function getUserRes(uid: number) {
-    if (IS_WINDOWS)
+    if (IS_WINDOWS) {
         return fail<IUser>(new PlatformNotSupportedError("getUserRes is not supported on Windows"));
+    }
 
     let disposable: IClosable | undefined = undefined;
 
     try {
         const lib = Deno.dlopen("libc.so.6", {
             getpwuid_r: {
-                parameters: ['u32', 'pointer', 'pointer', 'u32', 'pointer'],
-                result: 'i32',
+                parameters: ["u32", "pointer", "pointer", "u32", "pointer"],
+                result: "i32",
                 optional: true,
             },
             strerror_r: {
-                parameters: ['i32', 'buffer', 'i32'],
-                result: 'i32',
+                parameters: ["i32", "buffer", "i32"],
+                result: "i32",
                 optional: true,
-            }
+            },
         });
         disposable = lib;
 
-        if (lib.symbols.getpwuid_r === undefined || lib.symbols.getpwuid_r === null)
+        if (lib.symbols.getpwuid_r === undefined || lib.symbols.getpwuid_r === null) {
             return fail<IUser>(new FunctionMissingError("Symbol getpwuid_r not found"));
+        }
 
         let ret = Errno.ERANGE as number;
         let bufLength = 120;
-        while (ret === Errno.ERANGE)
-        {
+        while (ret === Errno.ERANGE) {
             const buf = new Uint8Array(bufLength);
             const pwdBuf = new Uint8Array(bufLength);
             const resultBuf = new Uint8Array(bufLength);
             const bufPtr = Deno.UnsafePointer.of(buf);
             const pwdBufPtr = Deno.UnsafePointer.of(pwdBuf);
             const resultBufPtr = Deno.UnsafePointer.of(resultBuf);
-        
+
             ret = lib.symbols.getpwuid_r(uid, pwdBufPtr, bufPtr, bufLength, resultBufPtr);
-    
+
             if (ret === 0) {
-                const v = new Deno.UnsafePointerView (pwdBufPtr as unknown as Deno.PointerObject<unknown>);
+                const v = new Deno.UnsafePointerView(pwdBufPtr as unknown as Deno.PointerObject<unknown>);
                 const nameId = v.getBigInt64(0);
                 const namePtr = Deno.UnsafePointer.create(nameId);
                 const name = Deno.UnsafePointerView.getCString(namePtr as Deno.PointerObject);
@@ -85,50 +86,52 @@ export function getUserRes(uid: number) {
     } catch (e) {
         return fail<IUser>(e);
     } finally {
-        if (disposable)
-            disposable.close(); 
+        if (disposable) {
+            disposable.close();
+        }
     }
 }
 
 export function getUser(uid: number) {
-    if (IS_WINDOWS)
+    if (IS_WINDOWS) {
         return null;
+    }
 
     let disposable: IClosable | undefined = undefined;
 
     try {
         const lib = Deno.dlopen("libc.so.6", {
             getpwuid_r: {
-                parameters: ['u32', 'pointer', 'pointer', 'u32', 'pointer'],
-                result: 'i32',
+                parameters: ["u32", "pointer", "pointer", "u32", "pointer"],
+                result: "i32",
                 optional: true,
             },
             strerror_r: {
-                parameters: ['i32', 'buffer', 'i32'],
-                result: 'i32',
+                parameters: ["i32", "buffer", "i32"],
+                result: "i32",
                 optional: true,
-            }
+            },
         });
         disposable = lib;
 
-        if (lib.symbols.getpwuid_r === undefined || lib.symbols.getpwuid_r === null)
+        if (lib.symbols.getpwuid_r === undefined || lib.symbols.getpwuid_r === null) {
             return null;
+        }
 
         let ret = Errno.ERANGE as number;
         let bufLength = 512;
-        while (ret === Errno.ERANGE)
-        {
+        while (ret === Errno.ERANGE) {
             const buf = new Uint8Array(bufLength);
             const pwdBuf = new Uint8Array(bufLength);
             const resultBuf = new Uint8Array(bufLength);
             const bufPtr = Deno.UnsafePointer.of(buf);
             const pwdBufPtr = Deno.UnsafePointer.of(pwdBuf);
             const resultBufPtr = Deno.UnsafePointer.of(resultBuf);
-        
+
             ret = lib.symbols.getpwuid_r(uid, pwdBufPtr, bufPtr, bufLength, resultBufPtr);
-    
+
             if (ret === 0) {
-                const v = new Deno.UnsafePointerView (pwdBufPtr as unknown as Deno.PointerObject<unknown>);
+                const v = new Deno.UnsafePointerView(pwdBufPtr as unknown as Deno.PointerObject<unknown>);
                 const nameId = v.getBigInt64(0);
                 const namePtr = Deno.UnsafePointer.create(nameId);
                 const name = Deno.UnsafePointerView.getCString(namePtr as Deno.PointerObject);
@@ -162,7 +165,8 @@ export function getUser(uid: number) {
         }
         return null;
     } finally {
-        if (disposable)
-            disposable.close(); 
+        if (disposable) {
+            disposable.close();
+        }
     }
 }

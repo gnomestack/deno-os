@@ -1,4 +1,4 @@
-import { test, assert } from "../../deps.dev.ts"
+import { assert, test } from "../../deps.dev.ts";
 import { Registry } from "./mod.ts";
 import { IS_WINDOWS } from "../../deps.ts";
 

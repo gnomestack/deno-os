@@ -2,7 +2,6 @@ import { Ptr, TypedStruct } from "./mod.ts";
 import { StringBuilder } from "../deps.ts";
 export { Ptr, TypedStruct };
 
-
 /**
  * Converts a string, Uint8Array or Uint16Array to a wide string buffer.
  * @param str

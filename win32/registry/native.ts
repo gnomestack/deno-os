@@ -1,4 +1,4 @@
-import { PlatformNotSupportedError, IS_WINDOWS } from "../../deps.ts";
+import { IS_WINDOWS, PlatformNotSupportedError } from "../../deps.ts";
 import { convertToWideStringBuffer, Ptr } from "../../ffi/win32.ts";
 
 // @ts-ignore using any for
